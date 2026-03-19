@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ViewLab Pro — Responsive Tester</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c10;
+  --surf1: #13131a;
+  --surf2: #1b1b26;
+  --surf3: #22222f;
+  --border: #2c2c40;
+  --border2: #3a3a52;
+  --cyan: #00e5ff;
+  --pink: #ff3cac;
+  --yellow: #ffd60a;
+  --green: #00ff88;
+  --orange: #ff7b00;
+  --text: #e8e8f2;
+  --muted: #5a5a78;
+  --muted2: #7a7a9a;
+  --r: 8px;
+  --header-h: 56px;
+  --toolbar-h: 48px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+.header {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: var(--surf1);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 50;
+}
+
+.logo {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.logo-icon {
+  width: 26px; height: 26px;
+  background: linear-gradient(135deg, var(--cyan), var(--pink));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+}
+.logo em { color: var(--cyan); font-style: normal; }
+
+/* nav tabs */
+.nav-tabs { display:flex; gap:2px; margin-left: 8px; }
+.nav-tab {
+  padding: 5px 13px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted2);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: all .15s;
+}
+.nav-tab:hover { color: var(--text); background: var(--surf2); }
+.nav-tab.active { color: var(--text); background: var(--surf3); }
+
+/* url bar */
+.url-form {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+  max-width: 620px;
+  margin: 0 auto;
+}
+.url-wrap {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  background: var(--surf2);
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.url-wrap:focus-within { border-color: var(--cyan); }
+.nav-btns {
+  display: flex;
+  gap: 1px;
+  padding: 0 8px;
+}
+.nav-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: color .15s;
+}
+.nav-btn:hover { color: var(--text); }
+#urlInput {
+  flex:1;
+  padding: 8px 10px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+}
+#urlInput::placeholder { color: var(--muted); }
+.refresh-btn {
+  padding: 0 12px;
+  font-size: 1rem;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color .15s;
+}
+.refresh-btn:hover { color: var(--cyan); }
+
+#loadBtn {
+  padding: 8px 20px;
+  background: var(--cyan);
+  color: #000;
+  border: none;
+  border-radius: 7px;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+#loadBtn:hover { background: #00c4db; transform: scale(1.03); }
+
+/* header right controls */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+}
+.icon-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surf2);
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  color: var(--muted2);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all .15s;
+  position: relative;
+}
+.icon-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.icon-btn.active { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,.08); }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  height: var(--toolbar-h);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  background: var(--surf1);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+.toolbar::-webkit-scrollbar { height: 3px; }
+.toolbar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.tb-label {
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  white-space: nowrap;
+  padding: 0 4px;
+}
+.tb-sep { width:1px; height:24px; background: var(--border); flex-shrink:0; margin: 0 4px; }
+
+.preset-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  background: var(--surf2);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted2);
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.preset-btn:hover { border-color: var(--cyan); color: var(--text); }
+.preset-btn.on { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,.07); }
+.preset-btn .px { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); }
+.preset-btn.on .px { color: rgba(0,229,255,0.6); }
+
+.custom-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dim-input {
+  width: 58px;
+  padding: 5px 8px;
+  background: var(--surf2);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  outline: none;
+  text-align: center;
+  transition: border-color .15s;
+}
+.dim-input:focus { border-color: var(--pink); }
+.dim-x { color: var(--muted); font-size: 0.75rem; }
+.apply-btn {
+  padding: 5px 11px;
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background .15s;
+}
+.apply-btn:hover { background: #d4008f; }
+
+.zoom-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.zoom-lbl { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+#zoomRange {
+  -webkit-appearance:none;
+  width: 80px; height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+#zoomRange::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--cyan);
+  cursor: pointer;
+}
+#zoomVal {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--cyan);
+  min-width: 34px;
+}
+.zoom-step-btn {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surf2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--muted2);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all .15s;
+}
+.zoom-step-btn:hover { color: var(--text); border-color: var(--border2); }
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+
+/* ── SIDE PANEL ── */
+.side-panel {
+  width: 220px;
+  background: var(--surf1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+  transition: width .25s;
+}
+.side-panel.collapsed { width: 0; overflow: hidden; }
+.side-panel::-webkit-scrollbar { width: 4px; }
+.side-panel::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.panel-section { padding: 14px; border-bottom: 1px solid var(--border); }
+.panel-title {
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 10px;
+}
+.device-group { margin-bottom: 8px; }
+.device-group-label {
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 5px;
+  padding-left: 2px;
+}
+.side-device-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted2);
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .12s;
+  text-align: left;
+  gap: 6px;
+}
+.side-device-btn:hover { background: var(--surf2); color: var(--text); }
+.side-device-btn.on { background: var(--surf3); border-color: var(--cyan); color: var(--cyan); }
+.side-device-dims {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+}
+.side-device-btn.on .side-device-dims { color: rgba(0,229,255,.5); }
+
+/* orientation toggle */
+.orientation-btns {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.orient-btn {
+  flex: 1;
+  padding: 6px;
+  background: var(--surf2);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted2);
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+}
+.orient-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.orient-btn.on { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,.07); }
+
+/* color picker */
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.color-row label { font-size: 0.75rem; color: var(--muted2); flex: 1; }
+#bgColorPicker {
+  width: 28px; height: 28px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+}
+
+/* scroll sync indicator */
+.sync-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.sync-label { font-size: 0.75rem; color: var(--muted2); }
+.toggle-switch {
+  position: relative;
+  width: 32px; height: 18px;
+}
+.toggle-switch input { opacity:0; width:0; height:0; }
+.toggle-slider {
+  position: absolute; inset:0;
+  background: var(--surf3);
+  border: 1px solid var(--border2);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: .2s;
+}
+.toggle-slider:before {
+  content:'';
+  position:absolute;
+  width: 12px; height: 12px;
+  left: 2px; top: 2px;
+  background: var(--muted);
+  border-radius: 50%;
+  transition: .2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: rgba(0,229,255,.2); border-color: var(--cyan); }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(14px); background: var(--cyan); }
+
+/* screenshot result */
+.screenshot-list { display:flex; flex-direction:column; gap:6px; }
+.screenshot-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: var(--surf2);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  color: var(--muted2);
+}
+.screenshot-item a {
+  color: var(--cyan);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+/* ── STAGE ── */
+.stage-wrap {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(0,229,255,.03) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(255,60,172,.03) 0%, transparent 55%);
+  background-color: var(--bg);
+}
+
+/* grid overlay */
+.stage-wrap.grid-on {
+  background-image:
+    radial-gradient(ellipse at 15% 15%, rgba(0,229,255,.03) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(255,60,172,.03) 0%, transparent 55%),
+    repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(255,255,255,.03) 31px, rgba(255,255,255,.03) 32px),
+    repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(255,255,255,.03) 31px, rgba(255,255,255,.03) 32px);
+}
+
+.stage-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 28px;
+  min-width: max-content;
+}
+
+/* ── DEVICE CARD ── */
+.device-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0,0,0,.55);
+  border: 1.5px solid var(--border);
+  transition: box-shadow .2s;
+  flex-shrink: 0;
+}
+.device-card:hover { box-shadow: 0 20px 60px rgba(0,0,0,.7), 0 0 0 1px var(--border2); }
+
+.card-chrome {
+  background: var(--surf2);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.dots { display:flex; gap:5px; }
+.dot { width:9px; height:9px; border-radius:50%; }
+.dot.r { background:#ff5f57; }
+.dot.y { background:#ffbd2e; }
+.dot.g { background:#28c840; }
+
+.card-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted2);
+  flex: 1;
+}
+.card-dims {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--cyan);
+  background: rgba(0,229,255,.08);
+  border: 1px solid rgba(0,229,255,.2);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+.card-iframe-wrap {
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+}
+.card-iframe-wrap iframe {
+  display: block;
+  border: none;
+  transform-origin: top left;
+}
+
+/* placeholder inside card */
+.card-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--surf1);
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 20px;
+}
+.card-placeholder .icon { font-size: 2rem; }
+
+.card-footer {
+  background: var(--surf2);
+  border-top: 1px solid var(--border);
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.card-footer-actions { display:flex; gap:6px; }
+.card-action {
+  padding: 3px 9px;
+  background: var(--surf3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--muted2);
+  font-size: 0.67rem;
+  font-weight: 600;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  cursor: pointer;
+  transition: all .12s;
+}
+.card-action:hover { border-color: var(--cyan); color: var(--cyan); }
+.card-action.remove:hover { border-color: var(--pink); color: var(--pink); }
+.home-bar { width:50px; height:3px; background: var(--border2); border-radius:2px; }
+
+/* ── RULER ── */
+.ruler-h {
+  position: sticky;
+  top: 0;
+  height: 20px;
+  background: var(--surf1);
+  border-bottom: 1px solid var(--border);
+  display: none;
+  z-index: 10;
+}
+
+/* ── INSPECTOR PANEL ── */
+.inspector {
+  width: 260px;
+  background: var(--surf1);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width .25s;
+  overflow: hidden;
+}
+.inspector.collapsed { width: 0; }
+.inspector-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.inspector-body { padding: 14px; overflow-y: auto; flex:1; }
+.inspector-body::-webkit-scrollbar { width:4px; }
+.inspector-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius:2px; }
+
+.insp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  font-size: 0.75rem;
+}
+.insp-key { color: var(--muted2); }
+.insp-val { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text); }
+.insp-val.cyan { color: var(--cyan); }
+.insp-val.green { color: var(--green); }
+.insp-val.yellow { color: var(--yellow); }
+
+/* ── STATUS BAR ── */
+.statusbar {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  background: var(--surf1);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+.status-dot { width:6px; height:6px; border-radius:50%; }
+.status-dot.cyan { background: var(--cyan); }
+.status-dot.green { background: var(--green); animation: pulse2 2s infinite; }
+.status-dot.red { background: #ff5f57; }
+@keyframes pulse2 {
+  0%,100%{opacity:1} 50%{opacity:.3}
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surf2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--cyan);
+  opacity: 0;
+  transition: all .25s;
+  pointer-events: none;
+  z-index: 999;
+  white-space: nowrap;
+}
+.toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+
+/* ── DROPDOWN MENU ── */
+.dropdown { position:relative; }
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--surf2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 6px;
+  min-width: 180px;
+  z-index: 100;
+  box-shadow: 0 12px 32px rgba(0,0,0,.5);
+}
+.dropdown-menu.open { display:block; }
+.menu-item {
+  padding: 7px 10px;
+  border-radius: 5px;
+  font-size: 0.78rem;
+  color: var(--muted2);
+  cursor: pointer;
+  transition: all .12s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.menu-item:hover { background: var(--surf3); color: var(--text); }
+.menu-sep { height:1px; background: var(--border); margin: 4px 0; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .side-panel { width:0; overflow:hidden; }
+  .inspector { width:0; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⊞</div>
+    View<em>Lab</em> <span style="font-size:.65rem;color:var(--muted);font-weight:500;margin-left:2px;">PRO</span>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="setMode('multi')">Multi</button>
+    <button class="nav-tab" onclick="setMode('single')">Single</button>
+  </div>
+
+  <div class="url-form">
+    <div class="url-wrap">
+      <div class="nav-btns">
+        <button class="nav-btn" title="Back" onclick="historyNav(-1)">‹</button>
+        <button class="nav-btn" title="Forward" onclick="historyNav(1)">›</button>
+      </div>
+      <input type="text" id="urlInput" placeholder="Enter URL (e.g. example.com)" autocomplete="off" spellcheck="false">
+      <button class="refresh-btn" title="Refresh" onclick="refreshAll()">⟳</button>
+    </div>
+    <button id="loadBtn" onclick="loadUrl()">▶ Load</button>
+  </div>
+
+  <div class="header-right">
+    <div class="icon-btn" title="Toggle Grid" id="gridBtn" onclick="toggleGrid()">⊞</div>
+    <div class="icon-btn" title="Toggle Scroll Sync" id="syncBtn" onclick="toggleSync()">⇅</div>
+    <div class="icon-btn" title="Screenshot All" onclick="screenshotAll()" title="Screenshot All">📷</div>
+    <div class="dropdown">
+      <div class="icon-btn" onclick="toggleMenu()" title="More">⋯</div>
+      <div class="dropdown-menu" id="dropMenu">
+        <div class="menu-item" onclick="copyUrl()">📋 Copy current URL</div>
+        <div class="menu-item" onclick="openInNew()">↗ Open in new tab</div>
+        <div class="menu-sep"></div>
+        <div class="menu-item" onclick="resetAll()">↺ Reset all devices</div>
+        <div class="menu-item" onclick="addCustomDevice()">＋ Add custom device</div>
+        <div class="menu-sep"></div>
+        <div class="menu-item" onclick="togglePanel('side')">◧ Toggle Side Panel</div>
+        <div class="menu-item" onclick="togglePanel('inspector')">◨ Toggle Inspector</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <span class="tb-label">Presets</span>
+
+  <button class="preset-btn" id="pb-mS" onclick="toggleDevice('mS')">
+    📱 Mobile S <span class="px">375</span>
+  </button>
+  <button class="preset-btn" id="pb-mM" onclick="toggleDevice('mM')">
+    📱 Mobile M <span class="px">390</span>
+  </button>
+  <button class="preset-btn" id="pb-mL" onclick="toggleDevice('mL')">
+    📱 Mobile L <span class="px">414</span>
+  </button>
+  <button class="preset-btn" id="pb-tab" onclick="toggleDevice('tab')">
+    📟 Tablet <span class="px">768</span>
+  </button>
+  <button class="preset-btn" id="pb-ipadPro" onclick="toggleDevice('ipadPro')">
+    📟 iPad Pro <span class="px">1024</span>
+  </button>
+  <button class="preset-btn" id="pb-lap" onclick="toggleDevice('lap')">
+    💻 Laptop <span class="px">1280</span>
+  </button>
+  <button class="preset-btn" id="pb-desk" onclick="toggleDevice('desk')">
+    🖥 Desktop <span class="px">1440</span>
+  </button>
+  <button class="preset-btn" id="pb-4k" onclick="toggleDevice('4k')">
+    🖥 4K <span class="px">2560</span>
+  </button>
+
+  <div class="tb-sep"></div>
+  <span class="tb-label">Custom</span>
+  <div class="custom-wrap">
+    <input type="number" class="dim-input" id="cW" placeholder="W" min="200" max="3840" value="600">
+    <span class="dim-x">×</span>
+    <input type="number" class="dim-input" id="cH" placeholder="H" min="200" max="2160" value="800">
+    <button class="apply-btn" onclick="addCustomSize()">Add</button>
+  </div>
+
+  <div class="zoom-wrap">
+    <button class="zoom-step-btn" onclick="stepZoom(-10)">−</button>
+    <input type="range" id="zoomRange" min="20" max="100" value="65" oninput="applyZoom(this.value)">
+    <span id="zoomVal">65%</span>
+    <button class="zoom-step-btn" onclick="stepZoom(10)">+</button>
+    <span class="zoom-lbl">Zoom</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- SIDE PANEL -->
+  <div class="side-panel" id="sidePanel">
+    <div class="panel-section">
+      <div class="panel-title">Devices</div>
+      <div class="device-group">
+        <div class="device-group-label">📱 Mobile</div>
+        <button class="side-device-btn" onclick="toggleDevice('mS')" id="sb-mS"><span>iPhone SE</span><span class="side-device-dims">375×667</span></button>
+        <button class="side-device-btn" onclick="toggleDevice('mM')" id="sb-mM"><span>iPhone 14</span><span class="side-device-dims">390×844</span></button>
+        <button class="side-device-btn" onclick="toggleDevice('mL')" id="sb-mL"><span>iPhone 14 Plus</span><span class="side-device-dims">414×896</span></button>
+        <button class="side-device-btn" onclick="toggleDevice('galaxy')" id="sb-galaxy"><span>Galaxy S23</span><span class="side-device-dims">360×780</span></button>
+        <button class="side-device-btn" onclick="toggleDevice('pixel')" id="sb-pixel"><span>Pixel 7</span><span class="side-device-dims">412×915</span></button>
+      </div>
+      <div class="device-group">
+        <div class="device-group-label">📟 Tablet</div>
+        <button class="side-device-btn" onclick="toggleDevice('tab')" id="sb-tab"><span>iPad Mini</span><span class="side-device-dims">768×1024</span></button>
+        <button class="side-device-btn" onclick="toggleDevice('ipadPro')" id="sb-ipadPro"><span>iPad Pro 11"</span><span class="side-device-dims">1024×1366</span></button>
+        <button class="side-device-btn" onclick="toggleDevice('tabS8')" id="sb-tabS8"><span>Galaxy Tab S8</span><span class="side-device-dims">800×1280</span></button>
+      </div>
+      <div class="device-group">
+        <div class="device-group-label">💻 Desktop</div>
+        <button class="side-device-btn" onclick="toggleDevice('lap')" id="sb-lap"><span>Laptop HD</span><span class="side-device-dims">1280×800</span></button>
+        <button class="side-device-btn" onclick="toggleDevice('desk')" id="sb-desk"><span>Desktop FHD</span><span class="side-device-dims">1440×900</span></button>
+        <button class="side-device-btn" onclick="toggleDevice('4k')" id="sb-4k"><span>4K UHD</span><span class="side-device-dims">2560×1440</span></button>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Orientation</div>
+      <div class="orientation-btns">
+        <button class="orient-btn on" id="orient-p" onclick="setOrientation('portrait')">▯ Portrait</button>
+        <button class="orient-btn" id="orient-l" onclick="setOrientation('landscape')">▭ Landscape</button>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Stage</div>
+      <div class="color-row">
+        <label>Background</label>
+        <input type="color" id="bgColorPicker" value="#0c0c10" oninput="changeBg(this.value)">
+      </div>
+      <div class="sync-toggle">
+        <span class="sync-label">Scroll Sync</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="syncCheck" onchange="toggleSync()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="panel-section" id="screenshotPanel">
+      <div class="panel-title">Screenshots <button onclick="loadScreenshotGallery()" style="float:right;background:none;border:none;color:var(--cyan);font-size:.7rem;cursor:pointer;font-weight:700;">↻ Refresh</button></div>
+      <div class="screenshot-list" id="screenshotList"><div style="font-size:.72rem;color:var(--muted2);">Click 📷 to take screenshots.</div></div>
+    </div>
+  </div>
+
+  <!-- STAGE -->
+  <div class="stage-wrap" id="stageWrap">
+    <div class="stage-inner" id="stageInner">
+      <div style="display:flex;align-items:center;justify-content:center;width:100%;min-height:400px;flex-direction:column;gap:16px;color:var(--muted);">
+        <div style="font-size:3rem;">⊞</div>
+        <div style="font-size:1rem;font-weight:700;color:var(--muted2);">No devices added</div>
+        <div style="font-size:0.82rem;max-width:320px;text-align:center;line-height:1.6;">Select devices from the toolbar or side panel, then enter a URL and click <strong style="color:var(--text)">Load</strong>.</div>
+        <button onclick="loadDefaults()" style="margin-top:8px;padding:9px 20px;background:var(--cyan);color:#000;border:none;border-radius:7px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">⚡ Load Default Devices</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSPECTOR -->
+  <div class="inspector" id="inspector">
+    <div class="inspector-header">Inspector</div>
+    <div class="inspector-body">
+      <div class="insp-row"><span class="insp-key">URL</span><span class="insp-val cyan" id="iUrl" style="font-size:.6rem;word-break:break-all;max-width:140px;">—</span></div>
+      <div class="insp-row"><span class="insp-key">Devices</span><span class="insp-val" id="iDevices">0</span></div>
+      <div class="insp-row"><span class="insp-key">Zoom</span><span class="insp-val cyan" id="iZoom">65%</span></div>
+      <div class="insp-row"><span class="insp-key">Orientation</span><span class="insp-val" id="iOrient">Portrait</span></div>
+      <div class="insp-row"><span class="insp-key">Scroll Sync</span><span class="insp-val green" id="iSync">Off</span></div>
+      <div class="insp-row"><span class="insp-key">Grid</span><span class="insp-val" id="iGrid">Off</span></div>
+
+      <div style="margin-top:16px;margin-bottom:8px;" class="panel-title">Active Devices</div>
+      <div id="activeDeviceList" style="display:flex;flex-direction:column;gap:4px;font-size:0.72rem;"></div>
+
+      <div style="margin-top:16px;margin-bottom:8px;" class="panel-title">Quick Actions</div>
+      <button onclick="loadDefaults()" style="width:100%;padding:7px;background:var(--surf2);border:1px solid var(--border);border-radius:6px;color:var(--muted2);font-size:0.75rem;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:6px;transition:all .15s;" onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--muted2)'">⚡ Default Devices</button>
+      <button onclick="removeAllDevices()" style="width:100%;padding:7px;background:var(--surf2);border:1px solid var(--border);border-radius:6px;color:var(--muted2);font-size:0.75rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='var(--muted2)'">✕ Remove All</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="statusbar">
+  <div class="status-item"><div class="status-dot green"></div><span id="stUrl">No URL loaded</span></div>
+  <div class="status-item"><div class="status-dot cyan"></div><span id="stDevices">0 devices</span></div>
+  <div class="status-item"><span id="stZoom">65%</span></div>
+  <div style="margin-left:auto" class="status-item"><span>ViewLab Pro — Responsive Tester</span></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DEVICE REGISTRY ──
+const DEVICES = {
+  mS:      { name:'Mobile S (375)',   w:375,  h:667  },
+  mM:      { name:'iPhone 14',        w:390,  h:844  },
+  mL:      { name:'Mobile L (414)',   w:414,  h:896  },
+  galaxy:  { name:'Galaxy S23',       w:360,  h:780  },
+  pixel:   { name:'Pixel 7',          w:412,  h:915  },
+  tab:     { name:'iPad Mini',        w:768,  h:1024 },
+  ipadPro: { name:'iPad Pro 11"',     w:1024, h:1366 },
+  tabS8:   { name:'Galaxy Tab S8',    w:800,  h:1280 },
+  lap:     { name:'Laptop HD',        w:1280, h:800  },
+  desk:    { name:'Desktop FHD',      w:1440, h:900  },
+  '4k':    { name:'4K UHD',           w:2560, h:1440 },
+};
+
+let activeDevices = new Set();
+let currentUrl = '';
+let zoom = 0.65;
+let orientation = 'portrait';
+let gridOn = false;
+let syncOn = false;
+let navHistory = [];
+let navIdx = -1;
+let mode = 'multi'; // multi | single
+
+// ── HELPERS ──
+function toast(msg, dur=2000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function getFullUrl(raw) {
+  raw = (raw || '').trim();
+  if (!raw) return '';
+  if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
+  // Route through local proxy to strip X-Frame-Options
+  return 'http://localhost:3000/proxy?url=' + encodeURIComponent(raw);
+}
+
+function getDisplayUrl(proxyUrl) {
+  try {
+    return decodeURIComponent(proxyUrl.split('?url=')[1] || proxyUrl);
+  } catch(e) { return proxyUrl; }
+}
+
+function updateStatus() {
+  document.getElementById('stUrl').textContent = currentUrl || 'No URL loaded';
+  document.getElementById('stDevices').textContent = activeDevices.size + ' device' + (activeDevices.size !== 1 ? 's' : '');
+  document.getElementById('stZoom').textContent = Math.round(zoom*100) + '%';
+  document.getElementById('iUrl').textContent = currentUrl || '—';
+  document.getElementById('iDevices').textContent = activeDevices.size;
+  document.getElementById('iZoom').textContent = Math.round(zoom*100) + '%';
+  document.getElementById('iOrient').textContent = orientation.charAt(0).toUpperCase() + orientation.slice(1);
+  document.getElementById('iSync').textContent = syncOn ? 'On' : 'Off';
+  document.getElementById('iSync').className = 'insp-val ' + (syncOn ? 'green' : '');
+  document.getElementById('iGrid').textContent = gridOn ? 'On' : 'Off';
+
+  // active device list in inspector
+  const list = document.getElementById('activeDeviceList');
+  list.innerHTML = '';
+  activeDevices.forEach(id => {
+    const d = id.startsWith('custom') ? customDevices[id] : DEVICES[id];
+    if (!d) return;
+    const [w,h] = effectiveSize(d);
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:4px 6px;background:var(--surf2);border-radius:5px;';
+    row.innerHTML = `<span style="color:var(--muted2)">${d.name}</span><span style="font-family:JetBrains Mono,monospace;font-size:.62rem;color:var(--cyan)">${w}×${h}</span>`;
+    list.appendChild(row);
+  });
+}
+
+function effectiveSize(d) {
+  return orientation === 'landscape' ? [d.h, d.w] : [d.w, d.h];
+}
+
+// ── LOAD URL ──
+function loadUrl() {
+  const raw = document.getElementById('urlInput').value;
+  const url = getFullUrl(raw);
+  if (!url) { toast('⚠ Enter a URL first'); return; }
+  if (activeDevices.size === 0) { toast('⚠ Add at least one device first'); return; }
+  currentUrl = url;
+  navHistory = navHistory.slice(0, navIdx+1);
+  navHistory.push(url);
+  navIdx = navHistory.length - 1;
+  renderAll();
+  updateStatus();
+  toast('✓ Loaded: ' + url.replace('https://','').slice(0,40));
+}
+
+document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key==='Enter') loadUrl(); });
+
+function historyNav(dir) {
+  const idx = navIdx + dir;
+  if (idx < 0 || idx >= navHistory.length) return;
+  navIdx = idx;
+  currentUrl = navHistory[idx];
+  document.getElementById('urlInput').value = currentUrl;
+  renderAll();
+  updateStatus();
+}
+
+function refreshAll() {
+  if (!currentUrl) { toast('⚠ No URL loaded'); return; }
+  renderAll();
+  toast('⟳ Refreshed');
+}
+
+// ── DEVICE TOGGLE ──
+function toggleDevice(id) {
+  if (activeDevices.has(id)) {
+    activeDevices.delete(id);
+    removeCard(id);
+  } else {
+    activeDevices.add(id);
+    addCard(id);
+  }
+  updatePresetBtn(id);
+  updateSideBtn(id);
+  updateStatus();
+  if (activeDevices.size === 0) showEmptyState();
+}
+
+function updatePresetBtn(id) {
+  const btn = document.getElementById('pb-' + id);
+  if (btn) btn.classList.toggle('on', activeDevices.has(id));
+}
+function updateSideBtn(id) {
+  const btn = document.getElementById('sb-' + id);
+  if (btn) btn.classList.toggle('on', activeDevices.has(id));
+}
+
+// ── RENDER ──
+function renderAll() {
+  clearEmptyState();
+  activeDevices.forEach(id => {
+    const existing = document.getElementById('card-' + id);
+    if (existing) updateCardIframe(id);
+    else addCard(id);
+  });
+}
+
+function showEmptyState() {
+  const inner = document.getElementById('stageInner');
+  if (inner.querySelector('.empty-msg')) return;
+  const div = document.createElement('div');
+  div.className = 'empty-msg';
+  div.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;min-height:400px;flex-direction:column;gap:16px;color:var(--muted);';
+  div.innerHTML = `<div style="font-size:3rem;">⊞</div><div style="font-size:1rem;font-weight:700;color:var(--muted2);">No devices added</div><div style="font-size:0.82rem;max-width:320px;text-align:center;line-height:1.6;">Select devices from toolbar or side panel.</div><button onclick="loadDefaults()" style="margin-top:8px;padding:9px 20px;background:var(--cyan);color:#000;border:none;border-radius:7px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">⚡ Load Default Devices</button>`;
+  inner.appendChild(div);
+}
+
+function clearEmptyState() {
+  const em = document.querySelector('.empty-msg');
+  if (em) em.remove();
+}
+
+function addCard(id) {
+  clearEmptyState();
+  const d = id.startsWith('custom') ? customDevices[id] : DEVICES[id];
+  if (!d) return;
+  const [w, h] = effectiveSize(d);
+  const sw = Math.round(w * zoom);
+  const sh = Math.round(h * zoom);
+
+  const card = document.createElement('div');
+  card.className = 'device-card';
+  card.id = 'card-' + id;
+  card.innerHTML = `
+    <div class="card-chrome">
+      <div class="dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <div class="card-title">${d.name}</div>
+      <div class="card-dims">${w} × ${h}</div>
+    </div>
+    <div class="card-iframe-wrap" id="wrap-${id}" style="width:${sw}px;height:${sh}px;">
+      ${currentUrl
+        ? `<iframe src="${currentUrl}" id="frame-${id}" style="width:${w}px;height:${h}px;transform:scale(${zoom});transform-origin:top left;" scrolling="yes"></iframe>`
+        : `<div class="card-placeholder" style="width:${sw}px;height:${sh}px;"><div class="icon">🔭</div><div>Enter a URL to preview</div></div>`
+      }
+    </div>
+    <div class="card-footer">
+      <div class="home-bar"></div>
+      <div class="card-footer-actions">
+        <button class="card-action" onclick="openCardInNew('${id}')">↗ Open</button>
+        <button class="card-action" onclick="rotateCard('${id}')">⟳ Rotate</button>
+        <button class="card-action remove" onclick="toggleDevice('${id}')">✕</button>
+      </div>
+    </div>`;
+  document.getElementById('stageInner').appendChild(card);
+
+  // scroll sync
+  if (syncOn) attachScrollSync(id);
+}
+
+function removeCard(id) {
+  const el = document.getElementById('card-' + id);
+  if (el) el.remove();
+}
+
+function updateCardIframe(id) {
+  const d = id.startsWith('custom') ? customDevices[id] : DEVICES[id];
+  if (!d) return;
+  const [w, h] = effectiveSize(d);
+  const sw = Math.round(w * zoom);
+  const sh = Math.round(h * zoom);
+  const wrap = document.getElementById('wrap-' + id);
+  if (!wrap) return;
+  wrap.style.width = sw + 'px';
+  wrap.style.height = sh + 'px';
+  wrap.innerHTML = currentUrl
+    ? `<iframe src="${currentUrl}" id="frame-${id}" style="width:${w}px;height:${h}px;transform:scale(${zoom});transform-origin:top left;" scrolling="yes"></iframe>`
+    : `<div class="card-placeholder" style="width:${sw}px;height:${sh}px;"><div class="icon">🔭</div><div>Enter a URL to preview</div></div>`;
+  if (syncOn) attachScrollSync(id);
+}
+
+function openCardInNew(id) {
+  if (currentUrl) window.open(currentUrl, '_blank');
+  else toast('⚠ No URL loaded');
+}
+
+let cardOrientations = {};
+function rotateCard(id) {
+  const d = id.startsWith('custom') ? customDevices[id] : DEVICES[id];
+  if (!d) return;
+  cardOrientations[id] = !cardOrientations[id];
+  const flipped = cardOrientations[id];
+  const [w, h] = flipped ? [d.h, d.w] : [d.w, d.h];
+  const sw = Math.round(w * zoom);
+  const sh = Math.round(h * zoom);
+  const wrap = document.getElementById('wrap-' + id);
+  const dimEl = document.querySelector(`#card-${id} .card-dims`);
+  if (wrap) {
+    wrap.style.width = sw + 'px';
+    wrap.style.height = sh + 'px';
+    wrap.innerHTML = currentUrl
+      ? `<iframe src="${currentUrl}" id="frame-${id}" style="width:${w}px;height:${h}px;transform:scale(${zoom});transform-origin:top left;" scrolling="yes"></iframe>`
+      : `<div class="card-placeholder" style="width:${sw}px;height:${sh}px;"><div class="icon">🔭</div><div>Enter a URL to preview</div></div>`;
+  }
+  if (dimEl) dimEl.textContent = w + ' × ' + h;
+  toast(`⟳ ${d.name} rotated`);
+}
+
+// ── ZOOM ──
+function applyZoom(val) {
+  zoom = val / 100;
+  document.getElementById('zoomVal').textContent = val + '%';
+  document.getElementById('zoomRange').value = val;
+  redrawAll();
+  updateStatus();
+}
+
+function stepZoom(delta) {
+  const newVal = Math.max(20, Math.min(100, Math.round(zoom*100) + delta));
+  applyZoom(newVal);
+}
+
+function redrawAll() {
+  activeDevices.forEach(id => {
+    const d = id.startsWith('custom') ? customDevices[id] : DEVICES[id];
+    if (!d) return;
+    const flipped = cardOrientations[id];
+    const [w, h] = flipped ? [d.h, d.w] : (orientation === 'landscape' ? [d.h, d.w] : [d.w, d.h]);
+    const sw = Math.round(w * zoom);
+    const sh = Math.round(h * zoom);
+    const wrap = document.getElementById('wrap-' + id);
+    const frame = document.getElementById('frame-' + id);
+    if (wrap) { wrap.style.width = sw + 'px'; wrap.style.height = sh + 'px'; }
+    if (frame) { frame.style.transform = `scale(${zoom})`; frame.style.width = w+'px'; frame.style.height = h+'px'; }
+  });
+  document.getElementById('stZoom').textContent = Math.round(zoom*100) + '%';
+  document.getElementById('iZoom').textContent = Math.round(zoom*100) + '%';
+}
+
+// ── ORIENTATION ──
+function setOrientation(dir) {
+  orientation = dir;
+  document.getElementById('orient-p').classList.toggle('on', dir==='portrait');
+  document.getElementById('orient-l').classList.toggle('on', dir==='landscape');
+  cardOrientations = {};
+  activeDevices.forEach(id => updateCardIframe(id));
+  updateStatus();
+  toast(dir === 'portrait' ? '▯ Portrait' : '▭ Landscape');
+}
+
+// ── GRID ──
+function toggleGrid() {
+  gridOn = !gridOn;
+  document.getElementById('stageWrap').classList.toggle('grid-on', gridOn);
+  document.getElementById('gridBtn').classList.toggle('active', gridOn);
+  document.getElementById('iGrid').textContent = gridOn ? 'On' : 'Off';
+  toast(gridOn ? '⊞ Grid on' : '⊞ Grid off');
+}
+
+// ── SCROLL SYNC ──
+let syncScrolling = false;
+function toggleSync() {
+  syncOn = !syncOn;
+  document.getElementById('syncBtn').classList.toggle('active', syncOn);
+  document.getElementById('syncCheck').checked = syncOn;
+  document.getElementById('iSync').textContent = syncOn ? 'On' : 'Off';
+  document.getElementById('iSync').className = 'insp-val ' + (syncOn ? 'green' : '');
+  if (syncOn) activeDevices.forEach(id => attachScrollSync(id));
+  toast(syncOn ? '⇅ Scroll sync on' : '⇅ Scroll sync off');
+}
+
+function attachScrollSync(id) {
+  const frame = document.getElementById('frame-' + id);
+  if (!frame) return;
+  frame.addEventListener('load', () => {
+    try {
+      const doc = frame.contentDocument || frame.contentWindow.document;
+      doc.addEventListener('scroll', () => {
+        if (syncScrolling) return;
+        syncScrolling = true;
+        const sx = doc.documentElement.scrollLeft;
+        const sy = doc.documentElement.scrollTop;
+        activeDevices.forEach(otherId => {
+          if (otherId === id) return;
+          const otherFrame = document.getElementById('frame-' + otherId);
+          if (!otherFrame) return;
+          try { otherFrame.contentWindow.scrollTo(sx, sy); } catch(e) {}
+        });
+        setTimeout(() => syncScrolling = false, 50);
+      }, { passive: true });
+    } catch(e) {}
+  });
+}
+
+// ── SCREENSHOT ──
+async function screenshotAll() {
+  if (!currentUrl) { toast('⚠ Load a URL first'); return; }
+  if (activeDevices.size === 0) { toast('⚠ Add devices first'); return; }
+
+  toast('📷 Taking screenshots...', 3000);
+  const realUrl = decodeURIComponent(currentUrl.split('?url=')[1] || currentUrl);
+
+  const tasks = [...activeDevices].map(async id => {
+    const d = id.startsWith('custom') ? customDevices[id] : DEVICES[id];
+    if (!d) return;
+    const [w,h] = effectiveSize(d);
+    try {
+      const resp = await fetch('http://localhost:3000/screenshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: realUrl, width: w, height: h, deviceName: d.name })
+      });
+      return await resp.json();
+    } catch(e) { return { error: e.message }; }
+  });
+
+  const results = await Promise.all(tasks);
+  const ok = results.filter(r => r && r.success);
+  const fail = results.filter(r => r && r.error);
+
+  if (ok.length) {
+    toast(`✅ ${ok.length} screenshot${ok.length>1?'s':''} saved!`, 3000);
+    loadScreenshotGallery();
+  }
+  if (fail.length) toast(`⚠ ${fail.length} failed — is puppeteer installed?`, 3000);
+}
+
+async function loadScreenshotGallery() {
+  document.getElementById('screenshotPanel').style.display = 'block';
+  const list = document.getElementById('screenshotList');
+  list.innerHTML = '<div style="font-size:.72rem;color:var(--muted2);">Loading...</div>';
+  try {
+    const resp = await fetch('http://localhost:3000/screenshots-list');
+    const files = await resp.json();
+    if (!files.length) { list.innerHTML = '<div style="font-size:.72rem;color:var(--muted2);">No screenshots yet.</div>'; return; }
+    list.innerHTML = files.map(f => `
+      <div class="screenshot-item">
+        <div>
+          <a href="${f.url}" target="_blank">🖼 ${f.filename.slice(0,28)}…</a>
+          <div style="font-size:.62rem;color:var(--muted);margin-top:2px;">${new Date(f.time).toLocaleTimeString()}</div>
+        </div>
+        <div style="display:flex;gap:4px;">
+          <a href="${f.url}" download style="color:var(--green);font-size:.7rem;font-weight:700;text-decoration:none;">↓</a>
+          <span onclick="deleteScreenshot('${f.filename}')" style="color:var(--pink);font-size:.7rem;font-weight:700;cursor:pointer;">✕</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="font-size:.72rem;color:var(--pink);">Could not reach server.</div>';
+  }
+}
+
+async function deleteScreenshot(filename) {
+  await fetch(`http://localhost:3000/screenshots/${filename}`, { method: 'DELETE' });
+  loadScreenshotGallery();
+  toast('🗑 Deleted');
+}
+
+// ── MODE ──
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.nav-tab').forEach((t,i) => t.classList.toggle('active', (i===0 && m==='multi') || (i===1 && m==='single')));
+  if (m === 'single') {
+    document.getElementById('stageInner').style.flexWrap = 'nowrap';
+    document.getElementById('stageInner').style.overflowX = 'auto';
+  } else {
+    document.getElementById('stageInner').style.flexWrap = 'wrap';
+    document.getElementById('stageInner').style.overflowX = 'visible';
+  }
+}
+
+// ── CUSTOM DEVICES ──
+const customDevices = {};
+let customCount = 0;
+
+function addCustomSize() {
+  const w = parseInt(document.getElementById('cW').value);
+  const h = parseInt(document.getElementById('cH').value);
+  if (!w||!h||w<200||h<200) { toast('⚠ Minimum 200px'); return; }
+  const id = 'custom' + (++customCount);
+  customDevices[id] = { name: `Custom ${w}×${h}`, w, h };
+  activeDevices.add(id);
+  addCard(id);
+  updateStatus();
+  toast(`＋ Added ${w}×${h}`);
+}
+
+function addCustomDevice() {
+  const w = prompt('Width (px):', '800');
+  const h = prompt('Height (px):', '600');
+  if (!w || !h) return;
+  document.getElementById('cW').value = w;
+  document.getElementById('cH').value = h;
+  addCustomSize();
+}
+
+// ── DEFAULT DEVICES ──
+function loadDefaults() {
+  ['mS','tab','lap'].forEach(id => {
+    if (!activeDevices.has(id)) toggleDevice(id);
+  });
+  toast('⚡ Default devices loaded');
+}
+
+// ── REMOVE ALL ──
+function removeAllDevices() {
+  [...activeDevices].forEach(id => {
+    activeDevices.delete(id);
+    removeCard(id);
+    updatePresetBtn(id);
+    updateSideBtn(id);
+  });
+  updateStatus();
+  showEmptyState();
+  toast('✕ All devices removed');
+}
+
+// ── PANEL TOGGLE ──
+function togglePanel(p) {
+  if (p === 'side') document.getElementById('sidePanel').classList.toggle('collapsed');
+  else document.getElementById('inspector').classList.toggle('collapsed');
+  closeMenu();
+}
+
+// ── MENU ──
+function toggleMenu() {
+  document.getElementById('dropMenu').classList.toggle('open');
+}
+function closeMenu() {
+  document.getElementById('dropMenu').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dropdown')) closeMenu();
+});
+
+function copyUrl() {
+  if (!currentUrl) { toast('⚠ No URL loaded'); closeMenu(); return; }
+  navigator.clipboard.writeText(currentUrl).then(() => toast('📋 Copied!'));
+  closeMenu();
+}
+
+function openInNew() {
+  if (!currentUrl) { toast('⚠ No URL loaded'); closeMenu(); return; }
+  window.open(currentUrl, '_blank');
+  closeMenu();
+}
+
+function resetAll() {
+  removeAllDevices();
+  currentUrl = '';
+  document.getElementById('urlInput').value = '';
+  navHistory = []; navIdx = -1;
+  updateStatus();
+  closeMenu();
+  toast('↺ Reset complete');
+}
+
+// ── BG COLOR ──
+function changeBg(color) {
+  document.getElementById('stageWrap').style.backgroundColor = color;
+}
+
+// ── INIT ──
+updateStatus();
+</script>
+</body>
+</html>
