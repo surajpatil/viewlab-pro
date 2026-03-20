@@ -750,7 +750,8 @@ body {
   <div class="header-right">
     <div class="icon-btn" title="Toggle Grid" id="gridBtn" onclick="toggleGrid()">⊞</div>
     <div class="icon-btn" title="Toggle Scroll Sync" id="syncBtn" onclick="toggleSync()">⇅</div>
-    <div class="icon-btn" title="Screenshot All" onclick="screenshotAll()" title="Screenshot All">📷</div>
+    <div class="icon-btn" id="mirrorBtn" onclick="toggleMirror()" title="Mirror Mode: sync clicks, scroll and navigation across all viewports" style="font-size:0.72rem;font-weight:700;min-width:90px;gap:5px;display:flex;align-items:center;justify-content:center;">🪞 Mirror <span id="mirrorBadge" style="font-size:.58rem;padding:1px 5px;border-radius:3px;background:rgba(0,0,0,0.3);color:var(--muted);">OFF</span></div>
+    <div class="icon-btn" title="Screenshot All" onclick="screenshotAll()">📷</div>
     <div class="dropdown">
       <div class="icon-btn" onclick="toggleMenu()" title="More">⋯</div>
       <div class="dropdown-menu" id="dropMenu">
@@ -1006,6 +1007,8 @@ function loadUrl() {
   renderAll();
   updateStatus();
   toast('✓ Loaded: ' + url.replace('https://','').slice(0,40));
+  // Re-attach mirror overlays after load
+  if (mirrorOn) setTimeout(() => activeDevices.forEach(id => attachMirror(id)), 800);
 }
 
 document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key==='Enter') loadUrl(); });
@@ -1110,11 +1113,16 @@ function addCard(id) {
 
   // scroll sync
   if (syncOn) attachScrollSync(id);
+  if (mirrorOn) attachMirror(id);
 }
 
 function removeCard(id) {
   const el = document.getElementById('card-' + id);
   if (el) el.remove();
+  if (mirrorOn) {
+    // reattach mirrors to remaining cards
+    setTimeout(() => activeDevices.forEach(i => attachMirror(i)), 100);
+  }
 }
 
 function updateCardIframe(id) {
@@ -1213,6 +1221,7 @@ function toggleGrid() {
 
 // ── SCROLL SYNC ──
 let syncScrolling = false;
+// ── SCROLL SYNC ──
 function toggleSync() {
   syncOn = !syncOn;
   document.getElementById('syncBtn').classList.toggle('active', syncOn);
@@ -1243,6 +1252,153 @@ function attachScrollSync(id) {
         setTimeout(() => syncScrolling = false, 50);
       }, { passive: true });
     } catch(e) {}
+  });
+}
+
+// ── MIRROR MODE ──
+let mirrorOn = false;
+let mirrorBusy = false;
+
+function toggleMirror() {
+  mirrorOn = !mirrorOn;
+  const btn = document.getElementById('mirrorBtn');
+  const badge = document.getElementById('mirrorBadge');
+  if (mirrorOn) {
+    btn.classList.add('active');
+    btn.style.borderColor = 'var(--pink)';
+    btn.style.color = 'var(--pink)';
+    btn.style.background = 'rgba(255,60,172,0.08)';
+    badge.textContent = 'ON';
+    badge.style.background = 'var(--pink)';
+    badge.style.color = '#fff';
+    // Attach mirror to all active frames
+    activeDevices.forEach(id => attachMirror(id));
+    toast('🪞 Mirror Mode ON — all interactions synced!', 3000);
+  } else {
+    btn.classList.remove('active');
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.style.background = '';
+    badge.textContent = 'OFF';
+    badge.style.background = 'rgba(0,0,0,0.3)';
+    badge.style.color = 'var(--muted)';
+    toast('🪞 Mirror Mode OFF', 2000);
+  }
+  updateStatus();
+}
+
+function attachMirror(id) {
+  const frame = document.getElementById('frame-' + id);
+  if (!frame) return;
+
+  // Use overlay div to intercept interactions
+  const wrap = document.getElementById('wrap-' + id);
+  if (!wrap) return;
+
+  // Remove existing overlay
+  const existing = wrap.querySelector('.mirror-overlay');
+  if (existing) existing.remove();
+
+  if (!mirrorOn) return;
+
+  // Create transparent overlay that captures events
+  const overlay = document.createElement('div');
+  overlay.className = 'mirror-overlay';
+  overlay.style.cssText = `
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    cursor: crosshair;
+    background: rgba(255,60,172,0.03);
+    border: 2px solid rgba(255,60,172,0.3);
+  `;
+
+  // CLICK sync
+  overlay.addEventListener('click', (e) => {
+    if (mirrorBusy) return;
+    mirrorBusy = true;
+    const rect = overlay.getBoundingClientRect();
+    // Get click position as percentage of scaled viewport
+    const d = id.startsWith('custom') ? customDevices[id] : DEVICES[id];
+    if (!d) { mirrorBusy = false; return; }
+    const [w, h] = effectiveSize(d);
+    const xPct = (e.clientX - rect.left) / rect.width;
+    const yPct = (e.clientY - rect.top) / rect.height;
+
+    // Also click inside source frame
+    try {
+      const fx = xPct * w;
+      const fy = yPct * h;
+      const el = frame.contentDocument.elementFromPoint(fx, fy);
+      if (el) el.click();
+    } catch(err) {}
+
+    // Mirror click to all other frames
+    activeDevices.forEach(otherId => {
+      if (otherId === id) return;
+      const otherFrame = document.getElementById('frame-' + otherId);
+      if (!otherFrame) return;
+      const od = otherId.startsWith('custom') ? customDevices[otherId] : DEVICES[otherId];
+      if (!od) return;
+      const [ow, oh] = effectiveSize(od);
+      try {
+        const ox = xPct * ow;
+        const oy = yPct * oh;
+        const el = otherFrame.contentDocument.elementFromPoint(ox, oy);
+        if (el) el.click();
+      } catch(err) {}
+    });
+
+    setTimeout(() => mirrorBusy = false, 100);
+  });
+
+  // SCROLL sync via overlay wheel
+  overlay.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (mirrorBusy) return;
+    mirrorBusy = true;
+    activeDevices.forEach(otherId => {
+      const otherFrame = document.getElementById('frame-' + otherId);
+      if (!otherFrame) return;
+      try { otherFrame.contentWindow.scrollBy(e.deltaX, e.deltaY); } catch(err) {}
+    });
+    // Also scroll source
+    try { frame.contentWindow.scrollBy(e.deltaX, e.deltaY); } catch(err) {}
+    setTimeout(() => mirrorBusy = false, 50);
+  }, { passive: false });
+
+  // KEYBOARD sync — type in one, mirrors to all
+  overlay.addEventListener('keydown', (e) => {
+    activeDevices.forEach(otherId => {
+      const otherFrame = document.getElementById('frame-' + otherId);
+      if (!otherFrame) return;
+      try {
+        const activeEl = otherFrame.contentDocument.activeElement;
+        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+          activeEl.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, bubbles: true }));
+        }
+      } catch(err) {}
+    });
+  });
+
+  wrap.style.position = 'relative';
+  wrap.appendChild(overlay);
+
+  // Add pink glow to mirrored frames
+  const card = document.getElementById('card-' + id);
+  if (card) card.style.boxShadow = '0 0 0 2px rgba(255,60,172,0.4), 0 16px 48px rgba(0,0,0,.55)';
+}
+
+function detachAllMirrors() {
+  activeDevices.forEach(id => {
+    const wrap = document.getElementById('wrap-' + id);
+    if (wrap) {
+      const overlay = wrap.querySelector('.mirror-overlay');
+      if (overlay) overlay.remove();
+    }
+    const card = document.getElementById('card-' + id);
+    if (card) card.style.boxShadow = '';
   });
 }
 
